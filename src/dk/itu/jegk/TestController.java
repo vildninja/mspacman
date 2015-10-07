@@ -45,7 +45,7 @@ public class TestController extends Controller<Constants.MOVE>
     public Constants.MOVE getMove(Game game, long timeDue) {
         
         
-        MonteCarlo<ActionSimulator> mc = new MonteCarlo<>(ActionSimulator.GetRoot(game, genotype), 0.01f);
+        MonteCarlo<ActionSimulator> mc = new MonteCarlo<>(ActionSimulator.GetRoot(game, genotype), 0.01 * genotype.geno[0]);
         
         int startTime = game.getTotalTime();
         
@@ -59,7 +59,7 @@ public class TestController extends Controller<Constants.MOVE>
             
             for (ActionSimulator a : actions)
             {
-                a.SimulateToJunction(100, startTime);
+                a.SimulateToJunction(Math.round((float)(100 * genotype.geno[1])), startTime);
             }
             
             mc.ExpandCurrent(actions);

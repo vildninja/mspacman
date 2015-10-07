@@ -6,6 +6,9 @@
 package dk.itu.jegk;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Random;
 import pacman.controllers.examples.StarterGhosts;
@@ -24,9 +27,12 @@ public class Evolution {
     
     public Evolution(int poolSize, int iterations, int evolve, int breed, int bottomMixIn, Genotype base) throws InterruptedException
     {
-        List<Worker> workers = new ArrayList<>();
+        if (poolSize % 2 == 1)
+            poolSize++;
+        
+        List<Worker> workers = new ArrayList<>(poolSize);
         for (int i = 0; i < poolSize; i++) {
-            workers.add(new Worker(Genotype.Evolve(base.geno, 0.3f), 4, 1000));
+            workers.add(new Worker(Genotype.Evolve(base.geno, 0.2f), 4, 1000));
         }
         
         for (int iteration = 0; iteration < iterations; iteration++)
@@ -34,7 +40,18 @@ public class Evolution {
             if (iteration > 0)
             {
                 // mix stuff
+                List<Worker> old = workers;
+                Collections.sort(old, new Sorter());
                 
+                workers = new ArrayList<>(poolSize);
+                for (int i = 0; i < poolSize / 2; i++) {
+                    workers.add(new Worker(Genotype.Evolve(old.get(i%evolve).geno.geno, 0.2f), 4, 1000));
+                    int a = i%breed;
+                    int b = i%(int)(Math.random() * 1000);
+                    while (b == a && breed > 1)
+                        b = i%(int)(Math.random() * 1000);
+                    workers.add(new Worker(Genotype.Breed(old.get(a).geno.geno, old.get(b).geno.geno), 4, 1000));
+                }
             }
             
             for (int i = 0; i < poolSize; i++)
@@ -62,6 +79,18 @@ public class Evolution {
                 workers.get(i).geno.SaveWithScore(workers.get(i).score, iteration + "_" + i + ".txt");
             }
         }
+    }
+    
+    public class Sorter implements Comparator<Worker>
+    {
+
+        @Override
+        public int compare(Worker o1, Worker o2) {
+            if (o1.score > o2.score)
+                return 1;
+            return -1;
+        }
+        
     }
     
     public class Worker extends Thread

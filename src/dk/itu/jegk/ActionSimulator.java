@@ -164,15 +164,15 @@ public class ActionSimulator implements CalculatedMove {
             return -10000;
         
         double result = 0;
-        result += score;
-        result += scoreTimeDamped;
-        result += survived;
+        result += score * geno.geno[SCORE];
+        result += scoreTimeDamped * geno.geno[SCORE_DAMPED];
+        result += survived * geno.geno[SURVIVED];
         //if (distanceToGhosts < 1)
             //result -= 100;
         if (isDead)
-            result -= 1000;
+            result -= 1000 * geno.geno[DEATH];
         if (nextLevel)
-            result += 10000 - survived * 10;
+            result += 10000 * geno.geno[NEXT_LEVEL] - survived * 10 * geno.geno[NEXT_LEVEL_SURVIVED];
         //result -= timeWithoutPills;
         
         return result;
