@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-private xmlns="http://www.netbeans.org/ns/project-private/1">
+    <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
+    <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
+        <group>
+            <file>file:/C:/Users/Jannek/Documents/GitHub/mspacman/src/dk/itu/jegk/behavior/BehaviorTree.java</file>
+            <file>file:/C:/Users/Jannek/Documents/GitHub/mspacman/src/pacman/game/internal/Maze.java</file>
+            <file>file:/C:/Users/Jannek/Documents/GitHub/mspacman/src/pacman/entries/pacman/MyPacMan.java</file>
+            <file>file:/C:/Users/Jannek/Documents/GitHub/mspacman/src/pacman/Executor.java</file>
+            <file>file:/C:/Users/Jannek/Documents/GitHub/mspacman/src/pacman/entries/ghosts/MyBaseGhosts.java</file>
+            <file>file:/C:/Users/Jannek/Documents/GitHub/mspacman/src/pacman/game/internal/Node.java</file>
+            <file>file:/C:/Users/Jannek/Documents/GitHub/mspacman/src/dk/itu/jegk/PacBehave.java</file>
+            <file>file:/C:/Users/Jannek/Documents/GitHub/mspacman/src/pacman/entries/pacman/MyBasePacMan.java</file>
+            <file>file:/C:/Users/Jannek/Documents/GitHub/mspacman/src/dk/itu/jegk/fsm/FSM.java</file>
+            <file>file:/C:/Users/Jannek/Documents/GitHub/mspacman/src/dk/itu/jegk/fsm/DistanceToGhosts.java</file>
+            <file>file:/C:/Users/Jannek/Documents/GitHub/mspacman/src/pacman/game/Game.java</file>
+            <file>file:/C:/Users/Jannek/Documents/GitHub/mspacman/src/dk/pew/pacman/MinMax.java</file>
+        </group>
+    </open-files>
+</project-private>
