@@ -92,11 +92,17 @@ public class MonteCarlo<E extends CalculatedMove>
     
     private final TreeNode root;
     private TreeNode current;
-    private final double c = 3;
+    private final double c;
     
-    public MonteCarlo(E rootItem)
+    public MonteCarlo(E rootItem, double c)
     {
+        this.c = c;
         root = new TreeNode(rootItem, null);
+    }
+    
+    public double RootScore()
+    {
+        return root.getValue(true);
     }
     
     public E FindBest()

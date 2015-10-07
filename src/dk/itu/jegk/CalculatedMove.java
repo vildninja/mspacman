@@ -10,5 +10,5 @@ package dk.itu.jegk;
  * @author Jannek
  */
 public interface CalculatedMove {
-    public float getValue();
+    public double getValue();
 }

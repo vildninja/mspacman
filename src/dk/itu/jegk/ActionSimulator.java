@@ -5,11 +5,9 @@
  */
 package dk.itu.jegk;
 
-import java.awt.Color;
 import java.util.EnumMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import pacman.controllers.Controller;
 import pacman.controllers.examples.StarterGhosts;
 import pacman.controllers.examples.StarterPacMan;
@@ -17,7 +15,6 @@ import pacman.game.Constants;
 import pacman.game.Constants.GHOST;
 import pacman.game.Constants.MOVE;
 import pacman.game.Game;
-import pacman.game.GameView;
 
 /**
  *
@@ -30,10 +27,12 @@ public class ActionSimulator implements CalculatedMove {
     private Game junction;
     
     private int score = 0;
+    private double scoreTimeDamped;
     private boolean isDead = false;
+    private boolean nextLevel = false;
     private int distanceToGhosts = 0;
     private int survived = 0;
-    private int timeWhithoutPills = 0;
+    private int timeWithoutPills = 0;
     
     public ActionSimulator(Game game, Constants.MOVE move)
     {
@@ -62,7 +61,7 @@ public class ActionSimulator implements CalculatedMove {
         return branches;
     }
     
-    public void SimulateToJunction(int rounds)
+    public void SimulateToJunction(int rounds, int startTime)
     {
         Controller<EnumMap<GHOST,MOVE>> ghosts = new StarterGhosts();
         Controller<MOVE> pacman = new StarterPacMan();
@@ -70,12 +69,13 @@ public class ActionSimulator implements CalculatedMove {
         boolean junctionFound = false;
         int lives = game.getPacmanNumberOfLivesRemaining();
         int lastIndex = game.getPacmanCurrentNodeIndex();
+        int level = game.getCurrentLevel();
         
         int currentTimeWithoutPills = 0;
         
         MOVE move = firstMove;
         
-        while (game.getTotalTime() < rounds || !junctionFound) {
+        while (game.getTotalTime() < startTime + rounds) {
             game.advanceGame(junctionFound ? pacman.getMove(game, 0) : move, ghosts.getMove(game, 0));
             
             if (game.getPacmanNumberOfLivesRemaining() < lives)
@@ -84,6 +84,13 @@ public class ActionSimulator implements CalculatedMove {
                 break;
             }
             lives = game.getPacmanNumberOfLivesRemaining();
+            
+            if (game.getCurrentLevel() != level)
+            {
+                nextLevel = true;
+                System.out.println("NEXT LEVEL!");
+                break;
+            }
             
             if (!junctionFound)
             {
@@ -133,19 +140,31 @@ public class ActionSimulator implements CalculatedMove {
             survived++;
             if (score == game.getScore())
             {
-                currentTimeWithoutPills++;
-                if (currentTimeWithoutPills > timeWhithoutPills)
-                    timeWhithoutPills = currentTimeWithoutPills;
+                timeWithoutPills++;
             }
+            scoreTimeDamped += (game.getScore() - score) * (1 - survived/(double)rounds);
             score = game.getScore();
         }
     }
     
     @Override
-    public float getValue() {
+    public double getValue() {
+        
+        double result = 0;
+        result += score;
+        result += scoreTimeDamped;
+        result += survived;
+        result += Math.max(distanceToGhosts, 10);
         if (isDead)
-            return score - 1000 + survived;
-        return score + survived + distanceToGhosts;
+            result -= 1000;
+        if (nextLevel)
+            result += 1000000 - survived * 1000;
+        //result -= timeWithoutPills;
+        
+        return result;
+//        if (isDead)
+//            return score - 1000 + survived;
+//        return score + survived + distanceToGhosts;
     }
     
     
