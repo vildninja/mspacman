@@ -28,7 +28,7 @@ public class TestController extends Controller<Constants.MOVE>
     }
 
     public TestController() {
-        genotype = Genotype.CreateWithValue(7, 1);
+        genotype = Genotype.CreateWithValue(8, 1);
     }
     
     

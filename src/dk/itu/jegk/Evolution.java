@@ -22,7 +22,7 @@ import pacman.game.Game;
 public class Evolution {
     
     public static void main(String[] args) throws InterruptedException {
-        new Evolution(20, 1, 3, 3, 0, Genotype.CreateWithValue(7, 1));
+        new Evolution(20, 1, 3, 3, 0, Genotype.CreateWithValue(8, 1));
     }
     
     public Evolution(int poolSize, int iterations, int evolve, int breed, int bottomMixIn, Genotype base) throws InterruptedException
