@@ -21,21 +21,17 @@ import pacman.game.Game;
  */
 public class TestController extends Controller<Constants.MOVE>
 {
+    private final Genotype genotype;
 
-    private MapAnalyzer analyzer = null;
-    
-    private final double[] factors;
-    
-    public TestController() {
-        factors = new double[7];
-        factors[0] = -0.1; // steps
-        factors[1] = 10; // pills
-        factors[2] = 1; // exits
-        factors[3] = 5; // ghost #1
-        factors[4] = 3; // ghost #2
-        factors[5] = 2; // ghost #3
-        factors[6] = 1; // ghost #4
+    public TestController(Genotype genotype) {
+        this.genotype = genotype;
     }
+
+    public TestController() {
+        genotype = Genotype.CreateWithValue(7, 1);
+    }
+    
+    
     
     public static void main(String[] args) {
         Executor exe = new Executor();
@@ -49,7 +45,7 @@ public class TestController extends Controller<Constants.MOVE>
     public Constants.MOVE getMove(Game game, long timeDue) {
         
         
-        MonteCarlo<ActionSimulator> mc = new MonteCarlo<>(ActionSimulator.GetRoot(game), 0.01f);
+        MonteCarlo<ActionSimulator> mc = new MonteCarlo<>(ActionSimulator.GetRoot(game, genotype), 0.01f);
         
         int startTime = game.getTotalTime();
         
@@ -72,7 +68,7 @@ public class TestController extends Controller<Constants.MOVE>
         ActionSimulator action = mc.GetAction();
         Constants.MOVE move = action != null ? action.firstMove : Constants.MOVE.NEUTRAL;
         
-       System.out.println("Terminating " + counter + " move " + move);
+        //System.out.println("Terminating " + counter + " move " + move);
         
         return move;
     }

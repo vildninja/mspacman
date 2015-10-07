@@ -50,7 +50,7 @@ public class MonteCarlo<E extends CalculatedMove>
         {
             if (items.isEmpty())
             {
-                Backpropagate(0);
+                Backpropagate(Double.NEGATIVE_INFINITY);
                 return;
             }
             children = new ArrayList<>(items.size());

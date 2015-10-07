@@ -99,7 +99,7 @@ public class MapAnalyzer {
         }
 
         @Override
-        public float getValue() {
+        public double getValue() {
             return value;
         }
         

@@ -34,15 +34,18 @@ public class ActionSimulator implements CalculatedMove {
     private int survived = 0;
     private int timeWithoutPills = 0;
     
-    public ActionSimulator(Game game, Constants.MOVE move)
+    private final Genotype geno;
+    
+    public ActionSimulator(Game game, Constants.MOVE move, Genotype geno)
     {
         this.game = game;
+        this.geno = geno;
         firstMove = move;
     }
     
-    public static ActionSimulator GetRoot(Game game)
+    public static ActionSimulator GetRoot(Game game, Genotype geno)
     {
-        ActionSimulator as = new ActionSimulator(game, MOVE.NEUTRAL);
+        ActionSimulator as = new ActionSimulator(game, MOVE.NEUTRAL, geno);
         as.junction = game;
         return as;
     }
@@ -56,7 +59,7 @@ public class ActionSimulator implements CalculatedMove {
         
         for (Constants.MOVE move : junction.getCurrentMaze().graph[junction.getPacmanCurrentNodeIndex()].neighbourhood.keySet())
         {
-            branches.add(new ActionSimulator(junction.copy(), move));
+            branches.add(new ActionSimulator(junction.copy(), move, geno));
         }
         return branches;
     }
@@ -142,23 +145,34 @@ public class ActionSimulator implements CalculatedMove {
             {
                 timeWithoutPills++;
             }
-            scoreTimeDamped += (game.getScore() - score) * (1 - survived/(double)rounds);
+            scoreTimeDamped += (game.getScore() - score) * Math.pow(1 - survived/(double)rounds, 2);
             score = game.getScore();
         }
     }
     
+    private static final int SCORE = 2;
+    private static final int SCORE_DAMPED = 3;
+    private static final int SURVIVED = 4;
+    private static final int DEATH = 5;
+    private static final int NEXT_LEVEL = 6;
+    private static final int NEXT_LEVEL_SURVIVED = 7;
+    
     @Override
     public double getValue() {
+        
+        if (junction == null && !nextLevel)
+            return -10000;
         
         double result = 0;
         result += score;
         result += scoreTimeDamped;
         result += survived;
-        result += Math.max(distanceToGhosts, 10);
+        //if (distanceToGhosts < 1)
+            //result -= 100;
         if (isDead)
             result -= 1000;
         if (nextLevel)
-            result += 1000000 - survived * 1000;
+            result += 10000 - survived * 10;
         //result -= timeWithoutPills;
         
         return result;
