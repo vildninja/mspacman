@@ -6,9 +6,15 @@
 package dk.itu.jegk;
 
 import java.io.BufferedOutputStream;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
+import java.nio.file.Path;
+import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 
@@ -20,10 +26,20 @@ public class Genotype
 {
     public final double[] geno;
     public double score;
+    public int iteration = 0;
     
     private Genotype(int size)
     {
         geno = new double[size];
+    }
+    
+    public Genotype Clone()
+    {
+        Genotype child = new Genotype(geno.length);
+        child.score = score;
+        child.iteration = iteration;
+        System.arraycopy(geno, 0, child.geno, 0, geno.length);
+        return child;
     }
     
     public static Genotype CreateWithValue(int size, double value)
@@ -105,6 +121,26 @@ public class Genotype
             for (int i = 0; i < geno.length; i++) {
                 System.out.println(geno[i]);
             }
+        }
+    }
+    
+    public static Genotype LoadFile(int size, String file)
+    {
+        try {
+            Scanner scanner = new Scanner(new FileInputStream(file));
+            
+            Genotype child = new Genotype(size);
+            child.score = scanner.nextDouble();
+            
+            for (int i = 0; i < size; i++) {
+                child.geno[i] = scanner.nextDouble();
+            }
+            
+            return child;
+            
+        } catch (FileNotFoundException ex) {
+            System.out.println("File not found: " + file + " - " + ex);
+            return CreateWithValue(size, 1);
         }
     }
 }

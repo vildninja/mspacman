@@ -5,6 +5,8 @@
  */
 package dk.itu.jegk;
 
+import java.io.File;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -22,48 +24,53 @@ import pacman.game.Game;
 public class Evolution {
     
     public static void main(String[] args) throws InterruptedException {
-        new Evolution(30, 1000, 5, 4, 1, Genotype.CreateWithValue(8, 1));
+        new Evolution(30, 1000, 5, 4, Genotype.CreateWithValue(8, 1));
     }
     
     public static final int MAX_TIME = 2000;
     
-    public Evolution(int poolSize, int iterations, int evolve, int breed, int bottomMixIn, Genotype base) throws InterruptedException
+    public final List<Genotype> allGenotypes;
+    
+    public Evolution(int poolSize, int iterations, int evolve, int breed, Genotype base) throws InterruptedException
     {
+        allGenotypes = new ArrayList<>();
+        
+        File dir = new File("Evolution");
+        for (File f : dir.listFiles())
+        {
+            if (!f.getName().endsWith("txt"))
+                continue;
+            
+            allGenotypes.add(Genotype.LoadFile(base.geno.length, f.getPath()));
+        }
+        
+        while (allGenotypes.size() < Math.max(evolve, breed))
+        {
+            allGenotypes.add(Genotype.Evolve(base.geno, 0.9f));
+        }
+        
         if (poolSize % 2 == 1)
             poolSize++;
         
         List<Worker> workers = new ArrayList<>(poolSize);
-        for (int i = 0; i < poolSize; i++) {
-            workers.add(new Worker(i > poolSize/2 ? Genotype.Evolve(base.geno, 0.9f) : Genotype.CreateBest44(), 4, MAX_TIME));
-        }
         
         for (int iteration = 0; iteration < iterations; iteration++)
         {
-            if (iteration > 0)
-            {
-                // mix stuff
-                List<Worker> old = workers;
-                Collections.sort(old, new Sorter());
-                
-                
-                workers = new ArrayList<>(poolSize);
-                
-                for (int i = 0; i < 4; i++) {
-                    workers.add(new Worker(old.get(i).geno, 4, MAX_TIME));
-                }
-                
-                for (int i = 0; i < bottomMixIn; i++) {
-                    old.add(0, old.remove(old.size() - 1));
-                }
-                
-                for (int i = 2; i < poolSize / 2; i++) {
-                    workers.add(new Worker(Genotype.Evolve(old.get(i%evolve).geno.geno, 0.1f), 4, MAX_TIME));
-                    int a = i%breed;
-                    int b = (int)(Math.random() * breed);
-                    while (b == a && breed > 1)
-                        b = (int)(Math.random() * breed);
-                    workers.add(new Worker(Genotype.Breed(old.get(a).geno.geno, old.get(b).geno.geno), 4, MAX_TIME));
-                }
+            // mix stuff
+            Collections.sort(allGenotypes, new Sorter(iteration, 0.92));
+            workers.clear();
+
+            for (int i = 0; i < 4; i++) {
+                workers.add(new Worker(allGenotypes.get(i).Clone(), 4, MAX_TIME));
+            }
+
+            for (int i = 2; i < poolSize / 2; i++) {
+                workers.add(new Worker(Genotype.Evolve(allGenotypes.get(i%evolve).geno, 0.1f), 4, MAX_TIME));
+                int a = i%breed;
+                int b = (int)(Math.random() * breed);
+                while (b == a && breed > 1)
+                    b = (int)(Math.random() * breed);
+                workers.add(new Worker(Genotype.Breed(allGenotypes.get(a).geno, allGenotypes.get(b).geno), 4, MAX_TIME));
             }
             
             for (int i = 0; i < poolSize; i++)
@@ -87,18 +94,29 @@ public class Evolution {
             
             for (int i = 0; i < poolSize; i++)
             {
+                Genotype g = workers.get(i).geno;
                 System.out.println(iteration + " done: #" + i + " " + workers.get(i).score);
-                workers.get(i).geno.SaveWithScore(workers.get(i).score, iteration + "_" + i + " " + ((int)workers.get(i).score) + ".txt");
+                g.SaveWithScore(workers.get(i).score, iteration + "_" + i + " " + ((int)workers.get(i).score) + ".txt");
+                g.iteration = iteration + 1;
+                allGenotypes.add(g);
             }
         }
     }
     
-    public class Sorter implements Comparator<Worker>
+    public class Sorter implements Comparator<Genotype>
     {
+        private final int iteration;
+        private final double decay;
 
+        public Sorter(int iteration, double decay) {
+            this.iteration = iteration;
+            this.decay = decay;
+        }
+        
         @Override
-        public int compare(Worker o1, Worker o2) {
-            if (o1.score < o2.score)
+        public int compare(Genotype o1, Genotype o2) {
+            if (o1.score * Math.pow(decay, iteration - o1.iteration) <
+                    o2.score * Math.pow(decay, iteration - o2.iteration))
                 return 1;
             return -1;
         }
