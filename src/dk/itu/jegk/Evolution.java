@@ -22,8 +22,10 @@ import pacman.game.Game;
 public class Evolution {
     
     public static void main(String[] args) throws InterruptedException {
-        new Evolution(20, 1, 3, 3, 0, Genotype.CreateWithValue(8, 1));
+        new Evolution(30, 1000, 5, 4, 1, Genotype.CreateWithValue(8, 1));
     }
+    
+    public static final int MAX_TIME = 2000;
     
     public Evolution(int poolSize, int iterations, int evolve, int breed, int bottomMixIn, Genotype base) throws InterruptedException
     {
@@ -32,7 +34,7 @@ public class Evolution {
         
         List<Worker> workers = new ArrayList<>(poolSize);
         for (int i = 0; i < poolSize; i++) {
-            workers.add(new Worker(Genotype.Evolve(base.geno, 0.2f), 4, 1000));
+            workers.add(new Worker(i > poolSize/2 ? Genotype.Evolve(base.geno, 0.9f) : Genotype.CreateBest44(), 4, MAX_TIME));
         }
         
         for (int iteration = 0; iteration < iterations; iteration++)
@@ -43,14 +45,24 @@ public class Evolution {
                 List<Worker> old = workers;
                 Collections.sort(old, new Sorter());
                 
+                
                 workers = new ArrayList<>(poolSize);
-                for (int i = 0; i < poolSize / 2; i++) {
-                    workers.add(new Worker(Genotype.Evolve(old.get(i%evolve).geno.geno, 0.2f), 4, 1000));
+                
+                for (int i = 0; i < 4; i++) {
+                    workers.add(new Worker(old.get(i).geno, 4, MAX_TIME));
+                }
+                
+                for (int i = 0; i < bottomMixIn; i++) {
+                    old.add(0, old.remove(old.size() - 1));
+                }
+                
+                for (int i = 2; i < poolSize / 2; i++) {
+                    workers.add(new Worker(Genotype.Evolve(old.get(i%evolve).geno.geno, 0.1f), 4, MAX_TIME));
                     int a = i%breed;
-                    int b = i%(int)(Math.random() * 1000);
+                    int b = (int)(Math.random() * breed);
                     while (b == a && breed > 1)
-                        b = i%(int)(Math.random() * 1000);
-                    workers.add(new Worker(Genotype.Breed(old.get(a).geno.geno, old.get(b).geno.geno), 4, 1000));
+                        b = (int)(Math.random() * breed);
+                    workers.add(new Worker(Genotype.Breed(old.get(a).geno.geno, old.get(b).geno.geno), 4, MAX_TIME));
                 }
             }
             
@@ -75,8 +87,8 @@ public class Evolution {
             
             for (int i = 0; i < poolSize; i++)
             {
-                System.out.println("done: " + workers.get(i).score);
-                workers.get(i).geno.SaveWithScore(workers.get(i).score, iteration + "_" + i + ".txt");
+                System.out.println(iteration + " done: #" + i + " " + workers.get(i).score);
+                workers.get(i).geno.SaveWithScore(workers.get(i).score, iteration + "_" + i + " " + ((int)workers.get(i).score) + ".txt");
             }
         }
     }
@@ -86,7 +98,7 @@ public class Evolution {
 
         @Override
         public int compare(Worker o1, Worker o2) {
-            if (o1.score > o2.score)
+            if (o1.score < o2.score)
                 return 1;
             return -1;
         }
@@ -129,7 +141,7 @@ public class Evolution {
                     }
 
                     avgScore += game.getScore();
-                    System.out.println(i+"\t"+game.getScore());
+                    //System.out.println(i+"\t"+game.getScore());
             }
             
             score = avgScore / runs;

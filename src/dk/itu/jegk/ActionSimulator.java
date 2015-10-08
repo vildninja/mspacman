@@ -91,7 +91,7 @@ public class ActionSimulator implements CalculatedMove {
             if (game.getCurrentLevel() != level)
             {
                 nextLevel = true;
-                System.out.println("NEXT LEVEL!");
+                //System.out.println("NEXT LEVEL!");
                 break;
             }
             

@@ -36,6 +36,38 @@ public class Genotype
         return child;
     }
     
+    public static Genotype CreateBestForTest()
+    {
+        Genotype child = new Genotype(8);
+        int i = 0;
+        child.geno[i++] = 0.1725553648254266;
+        child.geno[i++] = 1.5374059332699304;
+        child.geno[i++] = 1.7658946609910908;
+        child.geno[i++] = 1.0464031140100842;
+        child.geno[i++] = 1.290620322640275;
+        child.geno[i++] = 0.1600018459906336;
+        child.geno[i++] = 1.3218818865801538;
+        child.geno[i++] = 0.5799284657161324;
+        
+        return child;
+    }
+    
+    public static Genotype CreateBest44()
+    {
+        Genotype child = new Genotype(8);
+        int i = 0;
+        child.geno[i++] = 0.15481235467990292;
+        child.geno[i++] = 1.7641276621834787;
+        child.geno[i++] = 1.0909920449281676;
+        child.geno[i++] = 1.4292946780740667;
+        child.geno[i++] = 0.5569822943852913;
+        child.geno[i++] = 0.14418420653356526;
+        child.geno[i++] = 1.2839704185034961;
+        child.geno[i++] = 0.6182691168034687;
+        
+        return child;
+    }
+    
     public static Genotype Evolve(double[] base, double change)
     {
         Genotype child = new Genotype(base.length);
