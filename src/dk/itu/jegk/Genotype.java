@@ -6,6 +6,7 @@
 package dk.itu.jegk;
 
 import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -124,16 +125,17 @@ public class Genotype
         }
     }
     
-    public static Genotype LoadFile(int size, String file)
+    public static Genotype LoadFile(int size, File file)
     {
         try {
-            Scanner scanner = new Scanner(new FileInputStream(file));
+            Scanner scanner = new Scanner(file);
             
             Genotype child = new Genotype(size);
-            child.score = scanner.nextDouble();
+            
+            child.score = Double.parseDouble(scanner.next());
             
             for (int i = 0; i < size; i++) {
-                child.geno[i] = scanner.nextDouble();
+                child.geno[i] = Double.parseDouble(scanner.next());
             }
             
             return child;

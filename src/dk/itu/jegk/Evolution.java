@@ -41,8 +41,10 @@ public class Evolution {
             if (!f.getName().endsWith("txt"))
                 continue;
             
-            allGenotypes.add(Genotype.LoadFile(base.geno.length, f.getPath()));
+            allGenotypes.add(Genotype.LoadFile(base.geno.length, f));
         }
+        
+        System.out.println("Loaded " + allGenotypes.size() + " from file!");
         
         while (allGenotypes.size() < Math.max(evolve, breed))
         {
